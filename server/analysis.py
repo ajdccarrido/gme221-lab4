@@ -1,5 +1,6 @@
 import geopandas as gpd
 from sqlalchemy import create_engine
+from spatial_weights import contiguity_weights, knn_weights, distance_weights
 
 # Database connection parameters
 host = "localhost"
@@ -18,5 +19,10 @@ FROM public.assessed_parcels;
 
 gdf = gpd.read_postgis(sql_query, engine, geom_col="geom")
 
-print(gdf.head())
-print("CRS:", gdf.crs)
+# print(gdf.head())
+# print("CRS:", gdf.crs)
+
+w = contiguity_weights(gdf)
+
+print("Neighbors:", w.neighbors)
+
