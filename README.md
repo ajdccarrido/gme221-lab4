@@ -76,3 +76,59 @@ For KNN and distance-based weights, selecting an appropriate number of neighbors
 Visualizing spatial weights helps ensure that the defined neighborhood structure accurately represents spatial relationships in the dataset. By examining the network of connections, we can verify whether the selected method and parameters are appropriate for the analysis.
 
 If the neighborhood structure is incorrect, the results of Moran’s I may be misleading. For example, false hotspots or clusters may appear even when none exist, or real clusters may go undetected. Therefore, validating the spatial weights structure is an important step before conducting spatial autocorrelation analysis.
+
+### Reflection - Global Autocorrelation
+
+**1. What does positive Moran’s I indicate?**
+
+A positive Moran’s I indicates spatial clustering, meaning that areas with similar values (high–high or low–low) tend to occur near each other.
+
+The Global Moran's I of the different spatial weights methods are shown below: 
+
+#### Based on ass_ass_va
+- Contiguity Weights: `0.3174760337303677`
+- KNN (k=4): `0.18237132979784632`
+- Distance Weights (20 m): `0.06794511037172285`
+
+#### Based on ass_market
+- Contiguity Weights: `0.2660243420175595`
+- KNN (k=4): `0.1364143115453384`
+- Distance Weights (20 m): `0.06001617825009126`
+
+Among the three methods, contiguity weights produced the highest Moran’s I values, indicating stronger spatial clustering. KNN also shows clustering but at a weaker level. Distance-based weights produced the lowest values, suggesting a weaker spatial pattern that is closer to random.
+
+**2. Why is the p-value required for interpretation?**
+
+The p-value determines whether the observed Moran’s I is statistically significant or could have occurred by random chance.
+
+#### Based on ass_ass_va
+- Contiguity Weights: `0.001`
+- KNN: `0.001`
+- Distance Weights: `0.028`
+
+#### Based on ass_market
+- Contiguity Weights: `0.001`
+- KNN: `0.001`
+- Distance Weights: `0.012`
+
+Since all p-values are below the common significance level (e.g., 0.05), the results indicate that the observed spatial clustering is statistically significant and unlikely to be random.
+
+**3. What would Moran’s I near zero suggest?**
+
+A value near zero suggests a random spatial pattern, where the distribution of values does not show meaningful clustering or dispersion across space.
+
+**4. What is the role of the attribute in computing Moran’s I? Why the choice of attribute (e.g., ass_ass_va vs ass_market) matters.**
+
+The attribute variable provides the values being compared across spatial units. Moran’s I measures whether similar attribute values occur near each other in space.
+
+The choice of attribute matters because different variables may have different spatial distributions. For example, assessed values (ass_ass_va) and market values (ass_market) may reflect different economic or spatial patterns, which can affect the strength of spatial autocorrelation.
+
+**5. How the spatial autocorrelation result might change when a different attribute is analyzed.**
+
+Spatial autocorrelation results may vary depending on the attribute analyzed. If an attribute shows strong geographic clustering, Moran’s I will be higher. If the attribute values are more evenly distributed or random across space, the Moran’s I value will be lower. Therefore, different attributes can produce different levels of spatial autocorrelation.
+
+**6. Why Moran’s I requires both:**
+- a spatial weights matrix, and 
+- an attribute variable. 
+
+Moran’s I requires both components because they represent two key aspects of spatial analysis. The spatial weights matrix defines the neighborhood structure, indicating which spatial units influence each other. The attribute variable provides the values being compared across those spatial units. They allow the analysis to measure whether similar attribute values are spatially clustered according to the defined neighborhood relationships.
