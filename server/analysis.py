@@ -1,6 +1,7 @@
 import geopandas as gpd
 from sqlalchemy import create_engine
 from spatial_weights import contiguity_weights, knn_weights, distance_weights
+from visualization import visualize_neighbors
 
 # Database connection parameters
 host = "localhost"
@@ -22,7 +23,8 @@ gdf = gpd.read_postgis(sql_query, engine, geom_col="geom")
 # print(gdf.head())
 # print("CRS:", gdf.crs)
 
-w = contiguity_weights(gdf)
+w = distance_weights(gdf)
 
 print("Neighbors:", w.neighbors)
 
+visualize_neighbors(gdf, w)
