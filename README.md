@@ -26,7 +26,7 @@ By the end of this laboratory, you will:
 
 The following GeoJSON files contain the Local Moran’s I spatial cluster results generated using different spatial weights methods and attribute variables. 
 
-To reproduce these outputs, uncomment and modify the parameter for `w` ``(Line 29-31 of output/analysis.py)``
+To reproduce these outputs, uncomment and modify the parameter for `w` `(Line 29-31 of server/analysis.py)`
 
 - `contiguity_spatial_clusters (ass_ass_va).geojson`
 - `contiguity_spatial_clusters (ass_market).geojson`
