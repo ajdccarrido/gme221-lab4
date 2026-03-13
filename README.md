@@ -1,11 +1,11 @@
 # Laboratory Exercise 4 - Spatial Statistics: Spatial Autocorrelation and Cluster Detection
 
-In this laboratory, the focus shifts toward spatial statistical analysis. Instead of asking how geometry 
-is constructed, we now ask: 
+In this laboratory, the focus shifts toward spatial statistical analysis. Instead of asking how geometry is constructed, we now ask: 
 
 ***Are spatial values randomly distributed, clustered, or dispersed across space?***
 
 This question is addressed through spatial autocorrelation statistics, particularly Moran’s I. 
+
 By the end of this laboratory, you will: 
 
 1. Retrieve spatial features from PostGIS into Python. 
@@ -24,9 +24,25 @@ By the end of this laboratory, you will:
 
 ## Outputs Expected in output/
 
+The following GeoJSON files contain the Local Moran’s I spatial cluster results generated using different spatial weights methods and attribute variables. 
+
+To reproduce these outputs, uncomment and modify the parameter for `w` ``(Line 29-31 of output/analysis.py)``
+
+- `contiguity_spatial_clusters (ass_ass_va).geojson`
+- `contiguity_spatial_clusters (ass_market).geojson`
+- `distance_weights_spatial_clusters (ass_ass_va).geojson`
+- `distance_weights_spatial_clusters (ass_market).geojson`
+- `knn_spatial_clusters (ass_ass_va).geojson`
+- `knn_spatial_clusters (ass_market).geojson`
+
+The QGIS project file contains the generated spatial cluster outputs with the corresponding symbology and visualization settings.
+
+- `Lab4.qgz`
+
 ## Commit Milestones and Reflections
 
 ### Reflection - Interpreting the Neighborhood Structure
+
 **1. How does the spatial weights graph represent neighborhood relationships? Explain how parcel centroids and connecting lines correspond to nodes and edges in a spatial network.**
 
 The spatial weights graph represents neighborhood relationships as a network. Parcel centroids function as nodes, while the lines connecting them represent edges. Each edge indicates that two parcels are considered neighbors according to the chosen spatial weights method. In this way, the graph visualizes the spatial network that defines how parcels are related to one another.
@@ -40,7 +56,7 @@ The spatial weights graph represents neighborhood relationships as a network. Pa
 
 Contiguity weights identify neighbors based on shared boundaries between parcels. Parcels that touch each other are considered neighbors.
 
-K-nearest neighbors (KNN) identifies neighbors based on proximity. For each parcel centroid, the method selects the k closest parcels as neighbors, where k is the parameter specified by the user.
+K-nearest neighbors (KNN) identifies neighbors based on proximity. For each parcel centroid, the method selects the `k` closest parcels as neighbors, where `k` is the parameter specified by the user.
 
 Distance-based weights identify neighbors that fall within a specified distance threshold from a parcel centroid. A parcel is considered a neighbor if it lies within that distance.
 
@@ -53,7 +69,7 @@ Because each method defines neighbors differently, the resulting spatial graph c
 
 **What changes do you observe in the connectivity of the spatial graph?**
 
-Increasing K in the KNN method increases the number of neighbors connected to each parcel centroid. For example, when k = 4, each parcel is connected to its four nearest neighbors; when k = 5, it connects to five neighbors.
+Increasing `k` in the KNN method increases the number of neighbors connected to each parcel centroid. For example, when `k = 4`, each parcel is connected to its four nearest neighbors; when `k = 5`, it connects to five neighbors.
 
 Similarly, increasing the distance threshold in distance-based weights expands the search radius, which results in more parcels being identified as neighbors.
 
@@ -95,7 +111,7 @@ The Global Moran's I of the different spatial weights methods are shown below:
 - KNN (k=4): `0.1364143115453384`
 - Distance Weights (20 m): `0.06001617825009126`
 
-Among the three methods, contiguity weights produced the highest Moran’s I values, indicating stronger spatial clustering. KNN also shows clustering but at a weaker level. Distance-based weights produced the lowest values, suggesting a weaker spatial pattern that is closer to random.
+Among the three methods, `contiguity weights` produced the highest Moran’s I values, indicating stronger spatial clustering. KNN also shows clustering but at a weaker level. Distance-based weights produced the lowest values, suggesting a weaker spatial pattern that is closer to random.
 
 **2. Why is the p-value required for interpretation?**
 
@@ -121,7 +137,7 @@ A value near zero suggests a random spatial pattern, where the distribution of v
 
 The attribute variable provides the values being compared across spatial units. Moran’s I measures whether similar attribute values occur near each other in space.
 
-The choice of attribute matters because different variables may have different spatial distributions. For example, assessed values (ass_ass_va) and market values (ass_market) may reflect different economic or spatial patterns, which can affect the strength of spatial autocorrelation.
+The choice of attribute matters because different variables may have different spatial distributions. For example, assessed values (`ass_ass_va`) and market values (`ass_market`) may reflect different economic or spatial patterns, which can affect the strength of spatial autocorrelation.
 
 **5. How the spatial autocorrelation result might change when a different attribute is analyzed.**
 
@@ -132,3 +148,58 @@ Spatial autocorrelation results may vary depending on the attribute analyzed. If
 - an attribute variable. 
 
 Moran’s I requires both components because they represent two key aspects of spatial analysis. The spatial weights matrix defines the neighborhood structure, indicating which spatial units influence each other. The attribute variable provides the values being compared across those spatial units. They allow the analysis to measure whether similar attribute values are spatially clustered according to the defined neighborhood relationships.
+
+### Reflection - Interpreting Local Spatial Autocorrelation
+
+**1. What is the difference between Global Moran’s I and Local Moran’s I? Explain how each statistic describes spatial autocorrelation at different spatial scales.**
+
+Global Moran’s I measures overall spatial autocorrelation across the entire dataset, indicating whether similar values tend to cluster together or disperse across the study area. It provides a single summary statistic describing the general spatial pattern.
+
+Local Moran’s I, in contrast, identifies specific locations where clustering occurs. It evaluates spatial autocorrelation at the level of the minimum mapping unit (MMU), which in this case is the parcel. This allows the detection of local clusters such as hotspots, coldspots, and spatial outliers.
+
+**2. How are hotspots and coldspots identified using Local Moran’s I? Explain how the values of the statistic and the p-value determine whether a parcel belongs to a cluster.**
+
+Hotspots and coldspots are identified based on the sign of the Local Moran’s I statistic and its statistical significance.
+
+- A parcel with a **positive Local Moran’s I and a significant p-value `(p < 0.05)`** indicates that the parcel has a value similar to its neighbors. If the values are high, it forms a hotspot cluster (high–high).
+- A parcel with a **negative Local Moran’s I and a significant p-value `(p < 0.05)`** indicates that the parcel has values different from its neighbors, which can indicate a coldspot or spatial outlier depending on the surrounding values.
+- If the **`p-value ≥ 0.05`**, the parcel is considered not statistically significant, regardless of the Local Moran’s I value.
+
+**3. Where do hotspots appear in your dataset? Describe the spatial location of clusters of high values. What geographic or urban factors might explain this pattern?**
+
+Across different spatial weights and attributes, hotspot clusters consistently appear in the central portion of the dataset. These parcels likely represent areas with higher assessed or market values.
+
+This pattern may be explained by urban factors such as the presence of commercial properties, higher accessibility, or proximity to services such as transportation, hospitals, and other urban amenities. Such factors typically increase land or property values, leading to clusters of high values.
+
+**4. Where do coldspots appear in your dataset? Are there areas where low values cluster together? What spatial processes might explain these patterns?**
+
+Using contiguity weights, coldspots appear on parcels located on the left side of the dataset for both `ass_ass_va` and `ass_market`. When using KNN and distance-based weights, coldspots tend to appear on the bottom-right portion of the dataset.
+
+These clusters may represent areas with lower property values, which could be influenced by factors such as distance from commercial centers, limited accessibility, or differences in land use.
+
+**5. Did you observe any spatial outliers? A spatial outlier occurs when a parcel has a value very different from its neighbors. Explain how such cases appear in the dataset.**
+
+Yes, spatial outliers were observed. For example, the parcel with `gid = 699` appears as a hotspot surrounded by coldspots when using contiguity weights. Conversely, the parcel with `gid = 132` appears as a coldspot surrounded by hotspots.
+
+These cases indicate parcels whose values differ significantly from those of their neighbors. One possible explanation is data inconsistency or estimation errors. For instance, a parcel’s assessed or market value may have been overestimated or underestimated relative to nearby parcels.
+
+**6. How does changing the spatial weights method affect Local Moran’s I results? Repeat the analysis using another spatial weights method (e.g., KNN or distance). Do the hotspot locations change?**
+
+Yes, changing the spatial weights method affects the Local Moran’s I results because each method defines neighborhood relationships differently.
+
+For example, under contiguity weights, the large parcel with gid = 701 on the left side of the dataset shares boundaries with several parcels, making it a neighbor to many of them and influencing their classification. This results in several nearby parcels appearing as coldspots.
+
+When using KNN or distance-based weights, the set of neighbors changes, which alters the Local Moran’s I values and the resulting cluster classifications. While hotspot and coldspot locations vary across methods, some parcels in the central area remain consistent hotspots, suggesting a stable spatial pattern.
+
+
+**7. How does changing the attribute affect the spatial clusters? Run Local Moran’s I for:** 
+- ass_ass_va 
+- ass_market
+
+**Compare the hotspot patterns. Why might these attributes produce different spatial clusters?**
+
+Changing the attribute affects the spatial clusters because Local Moran’s I depends on the values of the variable being analyzed. When switching between ass_ass_va and ass_market, some parcels change classification—becoming hotspots, coldspots, or not statistically significant.
+
+For both attributes, hotspots generally remain concentrated in the central parcels, although the number and exact locations vary depending on the spatial weights method used. Coldspots tend to appear in the bottom-right portion of the dataset.
+
+In the context of this exercise, these differences occur because it is possible that the assessed values and market values reflect different valuation processes or economic conditions. These attributes also correspond to different values.
